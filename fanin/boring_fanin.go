@@ -15,12 +15,12 @@ func fanIn(input, input2 <-chan Message) <-chan Message {
 	c := make(chan Message)
 	go func() {
 		for {
-			c <- <-input
-		}
-	}()
-	go func() {
-		for {
-			c <- <-input2
+			select {
+			case s := <-input:
+				c <- s
+			case s := <-input2:
+				c <- s
+			}
 		}
 	}()
 	return c
