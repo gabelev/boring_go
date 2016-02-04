@@ -27,17 +27,16 @@ func fanIn(input, input2 <-chan Message) <-chan Message {
 }
 
 func main() {
-	c := fanIn(boring("joe"), boring("Anne"))
-	for i := 0; i < 10; i++ {
-		msg1 := <-c
-		fmt.Println(msg1.str)
-		msg2 := <-c
-		fmt.Println(msg2.str)
-		msg1.wait <- true
-		msg2.wait <- true
+	c := boring("gabe")
+	for {
+		select {
+		case s := <-c:
+			fmt.Println(s)
+		case <-time.After(1 * time.Second):
+			fmt.Println("You're too slow")
+			return
+		}
 	}
-
-	fmt.Println("You're boring: I'm Leaving")
 }
 
 func boring(msg string) <-chan Message { // returns receive-only channel of strings
