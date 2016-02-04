@@ -28,23 +28,24 @@ func fanIn(input, input2 <-chan Message) <-chan Message {
 
 func main() {
 	c := boring("gabe")
+	timeout := time.After(5 * time.Second)
 	for {
 		select {
 		case s := <-c:
 			fmt.Println(s)
-		case <-time.After(1 * time.Second):
-			fmt.Println("You're too slow")
+		case <-timeout:
+			fmt.Println("You talk too much")
 			return
 		}
 	}
 }
 
-func boring(msg string) <-chan Message { // returns receive-only channel of strings
-	c := make(chan Message)
+func boring(msg string) <-chan string { // returns receive-only channel of strings
+	c := make(chan string)
 	waitForIt := make(chan bool)
 	go func() { // we launch goroutine from inside func
 		for i := 0; ; i++ {
-			c <- Message{fmt.Sprintf("%s %d", msg, i), waitForIt}
+			c <- fmt.Sprintf("%s %d", msg, i)
 			time.Sleep(time.Duration(rand.Intn(2e3)) * time.Millisecond)
 			<-waitForIt
 		}
